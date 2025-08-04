@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -27,7 +25,6 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ onNavigate }: DashboardProps) => {
-  const { profile, signOut } = useAuth();
 
   const modules = [
     {
@@ -144,14 +141,8 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
     }
   ];
 
-  const getModulesForUser = () => {
-    if (!profile) return [];
-    return modules.filter(module => 
-      module.roles.includes(profile.role) || profile.role === 'admin'
-    );
-  };
-
-  const userModules = getModulesForUser();
+  // Show all modules since we removed authentication
+  const userModules = modules;
 
   return (
     <div className="min-h-screen bg-background">
@@ -167,24 +158,9 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
-                <p className="text-sm font-medium text-foreground">
-                  {profile?.first_name} {profile?.last_name}
-                </p>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {profile?.role}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={signOut}
-                className="flex items-center space-x-2"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Déconnexion</span>
-              </Button>
+            <div className="text-right">
+              <p className="text-sm font-medium text-foreground">Utilisateur</p>
+              <p className="text-xs text-muted-foreground">Mode démo</p>
             </div>
           </div>
         </div>
@@ -195,10 +171,10 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         {/* Welcome section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-2">
-            Bienvenue, {profile?.first_name || 'Utilisateur'} !
+            Bienvenue dans Cornerstone GESCO !
           </h2>
           <p className="text-muted-foreground">
-            Accédez aux modules selon vos autorisations. Votre rôle : <span className="font-medium capitalize">{profile?.role}</span>
+            Système de gestion complet pour briqueterie - Mode démo
           </p>
         </div>
 
