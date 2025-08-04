@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import cornerstoneLogo from '@/assets/cornerstone-logo.png';
 import { 
   Building2, 
   Package, 
@@ -151,7 +152,11 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Building2 className="h-8 w-8 text-primary" />
+              <img 
+                src={cornerstoneLogo} 
+                alt="Cornerstone Briques" 
+                className="h-12 w-12 object-contain"
+              />
               <div>
                 <h1 className="text-xl font-bold text-foreground">Cornerstone GESCO</h1>
                 <p className="text-sm text-muted-foreground">Système de gestion - Briqueterie</p>

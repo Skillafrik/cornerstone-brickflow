@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ShoppingCart, Plus, Search, Edit2, Eye } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -60,6 +60,11 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
 
   const [formData, setFormData] = useState({
     client_id: '',
+    client_name: '',
+    client_email: '',
+    client_address: '',
+    client_phone: '',
+    payment_method: '',
     product_id: '',
     quantity: '',
     unit_price: '',
@@ -138,14 +143,35 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
       const unitPrice = parseFloat(formData.unit_price);
       const totalAmount = quantity * unitPrice;
 
+      let clientId = formData.client_id;
+
+      // If no existing client selected and manual data provided, create new client
+      if (!clientId && formData.client_name) {
+        const { data: newClient, error: clientError } = await (supabase as any)
+          .from('clients')
+          .insert({
+            name: formData.client_name,
+            email: formData.client_email || null,
+            address: formData.client_address || null,
+            phone: formData.client_phone || null,
+            notes: `Mode de règlement: ${formData.payment_method || 'Non spécifié'}`
+          })
+          .select()
+          .single();
+
+        if (clientError) throw clientError;
+        clientId = newClient.id;
+      }
+
       const saleData = {
-        client_id: formData.client_id,
+        client_id: clientId,
         product_id: formData.product_id,
         quantity,
         unit_price: unitPrice,
         total_amount: totalAmount,
         status: formData.status,
         sale_date: new Date().toISOString(),
+        notes: formData.payment_method ? `Mode de règlement: ${formData.payment_method}` : null
       };
 
       if (editingSale) {
@@ -177,12 +203,18 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
       setEditingSale(null);
       setFormData({
         client_id: '',
+        client_name: '',
+        client_email: '',
+        client_address: '',
+        client_phone: '',
+        payment_method: '',
         product_id: '',
         quantity: '',
         unit_price: '',
         status: 'pending'
       });
       loadSales();
+      loadClients(); // Refresh clients list
     } catch (error) {
       console.error('Error saving sale:', error);
       toast({
@@ -197,12 +229,44 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
     setEditingSale(sale);
     setFormData({
       client_id: sale.client_id,
+      client_name: '',
+      client_email: '',
+      client_address: '',
+      client_phone: '',
+      payment_method: '',
       product_id: sale.product_id,
       quantity: sale.quantity.toString(),
       unit_price: sale.unit_price.toString(),
       status: sale.status
     });
     setIsDialogOpen(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette vente ?')) return;
+
+    try {
+      const { error } = await (supabase as any)
+        .from('sales')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Succès",
+        description: "Vente supprimée",
+      });
+      
+      loadSales();
+    } catch (error) {
+      console.error('Error deleting sale:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la vente",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredSales = sales.filter(sale =>
@@ -284,10 +348,10 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <Label htmlFor="client_id">Client</Label>
+                  <Label htmlFor="client_id">Client existant (optionnel)</Label>
                   <Select value={formData.client_id} onValueChange={(value) => setFormData({...formData, client_id: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner un client" />
+                      <SelectValue placeholder="Ou sélectionner un client existant" />
                     </SelectTrigger>
                     <SelectContent>
                       {clients.map((client) => (
@@ -298,6 +362,65 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {!formData.client_id && (
+                  <>
+                    <div>
+                      <Label htmlFor="client_name">Nom du client *</Label>
+                      <Input
+                        id="client_name"
+                        value={formData.client_name}
+                        onChange={(e) => setFormData({...formData, client_name: e.target.value})}
+                        placeholder="Nom complet du client"
+                        required={!formData.client_id}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="client_email">Email du client</Label>
+                      <Input
+                        id="client_email"
+                        type="email"
+                        value={formData.client_email}
+                        onChange={(e) => setFormData({...formData, client_email: e.target.value})}
+                        placeholder="email@exemple.com"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="client_address">Adresse du client</Label>
+                      <Input
+                        id="client_address"
+                        value={formData.client_address}
+                        onChange={(e) => setFormData({...formData, client_address: e.target.value})}
+                        placeholder="Adresse complète"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="client_phone">Téléphone du client</Label>
+                      <Input
+                        id="client_phone"
+                        value={formData.client_phone}
+                        onChange={(e) => setFormData({...formData, client_phone: e.target.value})}
+                        placeholder="Numéro de téléphone"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="payment_method">Mode de règlement</Label>
+                      <Select value={formData.payment_method} onValueChange={(value) => setFormData({...formData, payment_method: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner le mode de règlement" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="cash">Espèces</SelectItem>
+                          <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
+                          <SelectItem value="check">Chèque</SelectItem>
+                          <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                          <SelectItem value="credit">Crédit</SelectItem>
+                          <SelectItem value="other">Autre</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
                 <div>
                   <Label htmlFor="product_id">Produit</Label>
                   <Select value={formData.product_id} onValueChange={(value) => {
@@ -424,8 +547,8 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
                           <Button variant="outline" size="sm" onClick={() => handleEdit(sale)}>
                             <Edit2 className="h-4 w-4" />
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
+                          <Button variant="outline" size="sm" onClick={() => handleDelete(sale.id)}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>

@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Users, Plus, Search, Edit2, Trash2, UserCheck } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Search, Edit2, Trash2, UserCheck, Info } from 'lucide-react';
+import EmployeesDetailModal from './EmployeesDetailModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,6 +32,8 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Profile | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<Profile | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -166,6 +169,39 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le statut",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewDetails = (employee: Profile) => {
+    setSelectedEmployee(employee);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleSaveEmployeeDetails = async (employeeData: Partial<Profile>) => {
+    if (!selectedEmployee) return;
+    
+    try {
+      const { error } = await (supabase as any)
+        .from('employees')
+        .update(employeeData)
+        .eq('id', selectedEmployee.id);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Succès",
+        description: "Informations employé mises à jour",
+      });
+      
+      setIsDetailModalOpen(false);
+      loadEmployees();
+    } catch (error) {
+      console.error('Error updating employee:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour l'employé",
         variant: "destructive",
       });
     }
@@ -394,12 +430,17 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
                           <Button 
                             variant="outline" 
                             size="sm" 
+                            onClick={() => handleViewDetails(employee)}
+                            title="Voir détails"
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
                             onClick={() => toggleEmployeeStatus(employee.id, employee.is_active)}
                           >
                             <UserCheck className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
