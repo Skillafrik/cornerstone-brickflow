@@ -88,16 +88,16 @@ const DeliveriesModule = ({ onBack }: DeliveriesModuleProps) => {
         .from('deliveries')
         .select(`
           *,
-          sales (
+          sales!fk_deliveries_sale_id (
             client_id,
             product_id,
             quantity,
-            clients (
+            clients!fk_sales_client_id (
               name,
               email,
               address
             ),
-            products (
+            products!fk_sales_product_id (
               name,
               type,
               unit
@@ -126,12 +126,12 @@ const DeliveriesModule = ({ onBack }: DeliveriesModuleProps) => {
         .from('sales')
         .select(`
           *,
-          clients (
+          clients!fk_sales_client_id (
             name,
             email,
             address
           ),
-          products (
+          products!fk_sales_product_id (
             name,
             type,
             unit

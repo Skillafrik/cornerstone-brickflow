@@ -88,11 +88,11 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
         .from('sales')
         .select(`
           *,
-          clients (
+          clients!fk_sales_client_id (
             name,
             email
           ),
-          products (
+          products!fk_sales_product_id (
             name,
             type,
             unit

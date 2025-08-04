@@ -83,11 +83,11 @@ const QuotationsModule = ({ onBack }: QuotationsModuleProps) => {
         .from('quotations')
         .select(`
           *,
-          clients (
+          clients!fk_quotations_client_id (
             name,
             email
           ),
-          products (
+          products!fk_quotations_product_id (
             name,
             type,
             unit

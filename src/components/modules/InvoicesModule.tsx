@@ -85,16 +85,16 @@ const InvoicesModule = ({ onBack }: InvoicesModuleProps) => {
         .from('invoices')
         .select(`
           *,
-          sales (
+          sales!fk_invoices_sale_id (
             client_id,
             product_id,
             quantity,
             unit_price,
-            clients (
+            clients!fk_sales_client_id (
               name,
               email
             ),
-            products (
+            products!fk_sales_product_id (
               name,
               type
             )
@@ -122,11 +122,11 @@ const InvoicesModule = ({ onBack }: InvoicesModuleProps) => {
         .from('sales')
         .select(`
           *,
-          clients (
+          clients!fk_sales_client_id (
             name,
             email
           ),
-          products (
+          products!fk_sales_product_id (
             name,
             type
           )
