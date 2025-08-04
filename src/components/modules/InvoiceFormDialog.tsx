@@ -137,17 +137,19 @@ const InvoiceFormDialog = ({ isOpen, onClose, sale, onInvoiceCreated }: InvoiceF
 
     return (
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
-          <InvoiceTemplate
-            invoiceNumber={generateInvoiceNumber()}
-            clientName={sale.clients?.name || ''}
-            clientAddress={sale.clients?.address}
-            date={new Date().toISOString()}
-            items={items}
-            taxRate={taxRate}
-            onPrint={handlePrint}
-            onSend={handleSend}
-          />
+        <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto p-0">
+          <div className="p-6">
+            <InvoiceTemplate
+              invoiceNumber={generateInvoiceNumber()}
+              clientName={sale.clients?.name || ''}
+              clientAddress={sale.clients?.address}
+              date={new Date().toISOString()}
+              items={items}
+              taxRate={taxRate}
+              onPrint={handlePrint}
+              onSend={handleSend}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     );

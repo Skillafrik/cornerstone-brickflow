@@ -98,6 +98,13 @@ export type Database = {
             referencedRelation: "sales"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_deliveries_sale_id"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
         ]
       }
       employees: {
@@ -232,6 +239,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_invoices_sale_id"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoices_sale_id_fkey"
             columns: ["sale_id"]
             isOneToOne: false
@@ -275,6 +289,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_losses_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "losses_product_id_fkey"
             columns: ["product_id"]
@@ -365,6 +386,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_overtime_hours_employee_id"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "overtime_hours_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
@@ -412,6 +440,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_production_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "production_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -457,7 +492,15 @@ export type Database = {
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_production_orders_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -579,6 +622,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_quotations_client_id"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_quotations_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "quotations_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
@@ -600,6 +657,7 @@ export type Database = {
           created_at: string
           id: string
           notes: string | null
+          payment_method: string | null
           product_id: string
           quantity: number
           sale_date: string
@@ -613,6 +671,7 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          payment_method?: string | null
           product_id: string
           quantity: number
           sale_date?: string
@@ -626,6 +685,7 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          payment_method?: string | null
           product_id?: string
           quantity?: number
           sale_date?: string
@@ -635,6 +695,20 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_sales_client_id"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_sales_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_client_id_fkey"
             columns: ["client_id"]
@@ -683,6 +757,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_stock_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "stock_product_id_fkey"
             columns: ["product_id"]

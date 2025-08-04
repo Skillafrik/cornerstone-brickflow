@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Users, Plus, Search, Edit2, Trash2, UserCheck, Info } from 'lucide-react';
 import EmployeesDetailModal from './EmployeesDetailModal';
+import EmployeeFormDialog from './EmployeeFormDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,11 +18,15 @@ interface EmployeesModuleProps {
 
 interface Profile {
   id: string;
-  user_id: string;
   first_name?: string;
   last_name?: string;
   email?: string;
   phone?: string;
+  address?: string;
+  department?: string;
+  position?: string;
+  salary?: number;
+  hire_date?: string;
   role: 'admin' | 'production' | 'vente' | 'livraison' | 'comptabilite' | 'user';
   is_active: boolean;
 }
@@ -34,6 +39,8 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
   const [editingEmployee, setEditingEmployee] = useState<Profile | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<Profile | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isEmployeeFormOpen, setIsEmployeeFormOpen] = useState(false);
+  const [employeeFormData, setEmployeeFormData] = useState<any>(null);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -60,13 +67,20 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
 
   const loadEmployees = async () => {
     try {
-      const { data, error } = await (supabase as any)
-        .from('profiles')
+      const { data, error } = await supabase
+        .from('employees')
         .select('*')
         .order('first_name', { ascending: true });
 
       if (error) throw error;
-      setEmployees(data || []);
+      
+      // Map data to ensure correct typing
+      const typedEmployees = (data || []).map(emp => ({
+        ...emp,
+        role: emp.role as 'admin' | 'production' | 'vente' | 'livraison' | 'comptabilite' | 'user'
+      }));
+      
+      setEmployees(typedEmployees);
     } catch (error) {
       console.error('Error loading employees:', error);
       toast({
@@ -151,8 +165,8 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
 
   const toggleEmployeeStatus = async (employeeId: string, currentStatus: boolean) => {
     try {
-      const { error } = await (supabase as any)
-        .from('profiles')
+      const { error } = await supabase
+        .from('employees')
         .update({ is_active: !currentStatus })
         .eq('id', employeeId);
 
@@ -286,95 +300,16 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
             </div>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gradient-brick">
-                <Plus className="h-4 w-4 mr-2" />
-                Nouvel employé
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingEmployee ? 'Modifier l\'employé' : 'Nouvel employé'}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="first_name">Prénom</Label>
-                    <Input
-                      id="first_name"
-                      value={formData.first_name}
-                      onChange={(e) => setFormData({...formData, first_name: e.target.value})}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="last_name">Nom</Label>
-                    <Input
-                      id="last_name"
-                      value={formData.last_name}
-                      onChange={(e) => setFormData({...formData, last_name: e.target.value})}
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    placeholder="Numéro de téléphone"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="role">Rôle</Label>
-                  <Select value={formData.role} onValueChange={(value: any) => setFormData({...formData, role: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(roleLabels).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="is_active"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({...formData, is_active: e.target.checked})}
-                    className="rounded"
-                  />
-                  <Label htmlFor="is_active">Employé actif</Label>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Annuler
-                  </Button>
-                  <Button type="submit" className="gradient-brick">
-                    {editingEmployee ? 'Modifier' : 'Créer'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="gradient-brick"
+            onClick={() => {
+              setEmployeeFormData(null);
+              setIsEmployeeFormOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nouvel employé
+          </Button>
         </div>
 
         {/* Employees table */}
@@ -423,26 +358,33 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(employee)}>
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleViewDetails(employee)}
-                            title="Voir détails"
-                          >
-                            <Info className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => toggleEmployeeStatus(employee.id, employee.is_active)}
-                          >
-                            <UserCheck className="h-4 w-4" />
-                          </Button>
-                        </div>
+                         <div className="flex space-x-2">
+                           <Button 
+                             variant="outline" 
+                             size="sm" 
+                             onClick={() => {
+                               setEmployeeFormData(employee);
+                               setIsEmployeeFormOpen(true);
+                             }}
+                           >
+                             <Edit2 className="h-4 w-4" />
+                           </Button>
+                           <Button 
+                             variant="outline" 
+                             size="sm" 
+                             onClick={() => handleViewDetails(employee)}
+                             title="Voir détails"
+                           >
+                             <Info className="h-4 w-4" />
+                           </Button>
+                           <Button 
+                             variant="outline" 
+                             size="sm" 
+                             onClick={() => toggleEmployeeStatus(employee.id, employee.is_active)}
+                           >
+                             <UserCheck className="h-4 w-4" />
+                           </Button>
+                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -451,6 +393,24 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
             )}
           </CardContent>
         </Card>
+
+        {/* Employee Form Dialog */}
+        <EmployeeFormDialog
+          isOpen={isEmployeeFormOpen}
+          onClose={() => setIsEmployeeFormOpen(false)}
+          employee={employeeFormData}
+          onEmployeeCreated={loadEmployees}
+        />
+
+        {/* Employee Detail Modal */}
+        {selectedEmployee && (
+          <EmployeesDetailModal
+            employee={selectedEmployee}
+            isOpen={isDetailModalOpen}
+            onClose={() => setIsDetailModalOpen(false)}
+            onSave={handleSaveEmployeeDetails}
+          />
+        )}
       </main>
     </div>
   );

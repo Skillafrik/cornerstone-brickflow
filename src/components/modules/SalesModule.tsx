@@ -418,22 +418,21 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
                         placeholder="Numéro de téléphone"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="payment_method">Mode de règlement</Label>
-                      <Select value={formData.payment_method} onValueChange={(value) => setFormData({...formData, payment_method: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le mode de règlement" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="cash">Espèces</SelectItem>
-                          <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
-                          <SelectItem value="check">Chèque</SelectItem>
-                          <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                          <SelectItem value="credit">Crédit</SelectItem>
-                          <SelectItem value="other">Autre</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                     <div>
+                       <Label htmlFor="payment_method">Mode de règlement *</Label>
+                       <Select value={formData.payment_method} onValueChange={(value) => setFormData({...formData, payment_method: value})} required>
+                         <SelectTrigger>
+                           <SelectValue placeholder="Sélectionner le mode de règlement" />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="cash">Espèces</SelectItem>
+                           <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
+                           <SelectItem value="check">Chèque</SelectItem>
+                           <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                           <SelectItem value="credit">À crédit</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
                   </>
                 )}
                 <div>

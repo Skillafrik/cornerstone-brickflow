@@ -67,7 +67,7 @@ const ProductionModule = ({ onBack }: ProductionModuleProps) => {
         .from('production_orders')
         .select(`
           *,
-          products (
+          products!fk_production_orders_product_id (
             name,
             type,
             unit

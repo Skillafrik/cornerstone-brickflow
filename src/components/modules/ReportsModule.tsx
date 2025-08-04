@@ -138,21 +138,21 @@ const ReportsModule = ({ onBack }: ReportsModuleProps) => {
   };
 
   const loadStockData = async () => {
-    const { data: stock, error } = await (supabase as any)
-      .from('stock')
-      .select(`
-        current_quantity,
-        min_threshold,
-        products (
-          price
-        )
-      `);
+      const { data: stock, error } = await (supabase as any)
+        .from('stock')
+        .select(`
+          quantity,
+          minimum_stock,
+          products!fk_stock_product_id (
+            price
+          )
+        `);
 
     if (error) throw error;
 
     const totalProducts = stock?.length || 0;
-    const lowStockItems = (stock || []).filter(item => item.current_quantity <= item.min_threshold).length;
-    const totalValue = (stock || []).reduce((sum, item) => sum + (item.current_quantity * (item.products?.price || 0)), 0);
+    const lowStockItems = (stock || []).filter(item => item.quantity <= item.minimum_stock).length;
+    const totalValue = (stock || []).reduce((sum, item) => sum + (item.quantity * (item.products?.price || 0)), 0);
 
     setStockData({ total_products: totalProducts, low_stock_items: lowStockItems, total_value: totalValue });
   };

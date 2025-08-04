@@ -165,7 +165,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             
             <div className="text-right">
               <p className="text-sm font-medium text-foreground">Utilisateur</p>
-              <p className="text-xs text-muted-foreground">Mode démo</p>
+              <p className="text-xs text-green-600">Système en production</p>
             </div>
           </div>
         </div>
@@ -179,7 +179,7 @@ const Dashboard = ({ onNavigate }: DashboardProps) => {
             Bienvenue dans Cornerstone GESCO !
           </h2>
           <p className="text-muted-foreground">
-            Système de gestion complet pour briqueterie - Mode démo
+            Système de gestion complet pour briqueterie
           </p>
         </div>
 
