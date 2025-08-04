@@ -71,7 +71,7 @@ const DeliveriesModule = ({ onBack }: DeliveriesModuleProps) => {
     sale_id: '',
     delivery_date: '',
     delivery_address: '',
-    status: 'scheduled' as const,
+    status: 'scheduled' as 'scheduled' | 'in_transit' | 'delivered' | 'failed',
     driver_name: '',
     vehicle_info: '',
     notes: ''

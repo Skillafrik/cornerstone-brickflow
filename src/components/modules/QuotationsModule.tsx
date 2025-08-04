@@ -67,7 +67,7 @@ const QuotationsModule = ({ onBack }: QuotationsModuleProps) => {
     quantity: '',
     unit_price: '',
     valid_until: '',
-    status: 'draft' as const,
+    status: 'draft' as 'draft' | 'sent' | 'accepted' | 'rejected' | 'expired',
     notes: ''
   });
 

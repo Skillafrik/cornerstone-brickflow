@@ -38,7 +38,7 @@ const EmployeesModule = ({ onBack }: EmployeesModuleProps) => {
     last_name: '',
     email: '',
     phone: '',
-    role: 'user' as const,
+    role: 'user' as 'admin' | 'production' | 'vente' | 'livraison' | 'comptabilite' | 'user',
     is_active: true
   });
 

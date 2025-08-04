@@ -43,8 +43,8 @@ const ObjectivesModule = ({ onBack }: ObjectivesModuleProps) => {
     unit: '',
     start_date: '',
     end_date: '',
-    status: 'active' as const,
-    category: 'production' as const
+    status: 'active' as 'active' | 'completed' | 'cancelled',
+    category: 'production' as 'production' | 'sales' | 'quality' | 'efficiency' | 'other'
   });
 
   const categoryLabels = {

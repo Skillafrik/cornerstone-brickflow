@@ -63,7 +63,7 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
     product_id: '',
     quantity: '',
     unit_price: '',
-    status: 'pending' as const
+    status: 'pending' as 'pending' | 'completed' | 'cancelled'
   });
 
   useEffect(() => {

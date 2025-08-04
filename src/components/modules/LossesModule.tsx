@@ -51,7 +51,7 @@ const LossesModule = ({ onBack }: LossesModuleProps) => {
   const [formData, setFormData] = useState({
     product_id: '',
     quantity: '',
-    loss_type: 'damage' as const,
+    loss_type: 'damage' as 'damage' | 'expiry' | 'theft' | 'other',
     loss_date: '',
     description: ''
   });

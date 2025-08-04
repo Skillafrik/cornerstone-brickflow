@@ -69,7 +69,7 @@ const InvoicesModule = ({ onBack }: InvoicesModuleProps) => {
   const [formData, setFormData] = useState({
     sale_id: '',
     due_date: '',
-    status: 'draft' as const,
+    status: 'draft' as 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled',
     tax_rate: '18',
     notes: ''
   });
