@@ -193,6 +193,7 @@ export type Database = {
           due_date: string
           id: string
           invoice_number: string
+          issue_date: string
           notes: string | null
           sale_id: string
           status: string
@@ -206,6 +207,7 @@ export type Database = {
           due_date: string
           id?: string
           invoice_number: string
+          issue_date?: string
           notes?: string | null
           sale_id: string
           status?: string
@@ -219,6 +221,7 @@ export type Database = {
           due_date?: string
           id?: string
           invoice_number?: string
+          issue_date?: string
           notes?: string | null
           sale_id?: string
           status?: string
@@ -416,6 +419,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      production_orders: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          planned_quantity: number
+          produced_quantity: number
+          product_id: string
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          planned_quantity?: number
+          produced_quantity?: number
+          product_id: string
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          planned_quantity?: number
+          produced_quantity?: number
+          product_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       products: {
         Row: {

@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, ShoppingCart, Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Plus, Search, Edit2, Trash2, Receipt } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import InvoiceFormDialog from './InvoiceFormDialog';
 
 interface SalesModuleProps {
   onBack: () => void;
@@ -22,10 +23,12 @@ interface Sale {
   unit_price: number;
   total_amount: number;
   sale_date: string;
+  payment_method?: string;
   status: 'pending' | 'completed' | 'cancelled';
   clients?: {
     name: string;
-    email: string;
+    email?: string;
+    address?: string;
   };
   products?: {
     name: string;
@@ -56,6 +59,8 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
+  const [invoiceDialogSale, setInvoiceDialogSale] = useState<Sale | null>(null);
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -269,6 +274,16 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
     }
   };
 
+  const handleCreateInvoice = (sale: Sale) => {
+    setInvoiceDialogSale(sale);
+    setIsInvoiceDialogOpen(true);
+  };
+
+  const handleInvoiceCreated = () => {
+    // Optionally reload sales or update status
+    loadSales();
+  };
+
   const filteredSales = sales.filter(sale =>
     sale.clients?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sale.products?.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -340,7 +355,7 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
                 Nouvelle vente
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingSale ? 'Modifier la vente' : 'Nouvelle vente'}
@@ -542,16 +557,26 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
                           {getStatusText(sale.status)}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEdit(sale)}>
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleDelete(sale.id)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                       <TableCell>
+                         <div className="flex space-x-2">
+                           <Button variant="outline" size="sm" onClick={() => handleEdit(sale)}>
+                             <Edit2 className="h-4 w-4" />
+                           </Button>
+                           <Button variant="outline" size="sm" onClick={() => handleDelete(sale.id)}>
+                             <Trash2 className="h-4 w-4" />
+                           </Button>
+                           {sale.status === 'completed' && (
+                             <Button 
+                               variant="outline" 
+                               size="sm" 
+                               onClick={() => handleCreateInvoice(sale)}
+                               className="text-green-600 hover:text-green-700"
+                             >
+                               <Receipt className="h-4 w-4" />
+                             </Button>
+                           )}
+                         </div>
+                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -559,6 +584,14 @@ const SalesModule = ({ onBack }: SalesModuleProps) => {
             )}
           </CardContent>
         </Card>
+
+        {/* Invoice Form Dialog */}
+        <InvoiceFormDialog
+          isOpen={isInvoiceDialogOpen}
+          onClose={() => setIsInvoiceDialogOpen(false)}
+          sale={invoiceDialogSale}
+          onInvoiceCreated={handleInvoiceCreated}
+        />
       </main>
     </div>
   );
